@@ -1,5 +1,8 @@
 import { relations } from "drizzle-orm";
-import { pgTable, text, timestamp, boolean, integer, primaryKey } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, integer, primaryKey, pgEnum } from "drizzle-orm/pg-core";
+
+export const ROOM_TYPE = pgEnum("room_type", ["classroom", "computer-lab", "science-lab", "lecture-hall", "office", "performance-hall", "chapel", "gym", "breakroom", "conference-room", "lobby", "study-room", "special"]);
+export const FEATURE_CATEGORY = pgEnum("feature_category", ["display", "audio", "connectivity", "furniture", "characteristics", "other"]);
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -77,12 +80,14 @@ export const rooms = pgTable("rooms", {
     .notNull()
     .references(() => buildings.id, { onDelete: "cascade" }),
   roomNumber: text("room_number").notNull(),
-  roomType: text("room_type").notNull(), // classroom, lab, lecture hall, etc.
+  roomType: ROOM_TYPE("room_type").notNull(),
   displayName: text("display_name"), // optional special name like "Chapel"
   capacity: integer("capacity").notNull(),
   floor: integer("floor").notNull(),
   accessible: boolean("accessible").default(true).notNull(),
   notes: text("notes"),
+  photoBack: text("photo_back"),
+  photoFront: text("photo_front"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });

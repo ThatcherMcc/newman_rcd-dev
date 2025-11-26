@@ -15,6 +15,13 @@
       "when": 1763509956761,
       "tag": "0001_fluffy_guardsmen",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1763655494648,
+      "tag": "0002_cynical_dexter_bennett",
+      "breakpoints": true
     }
   ]
 }
