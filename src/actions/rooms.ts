@@ -154,3 +154,53 @@ export async function getFeatures(): Promise<Feature[]> {
     .from(features)
     .orderBy(features.category, features.name);
 }
+
+export async function getRoomById(id: string): Promise<RoomWithDetails | null> {
+  const roomResult = await db
+    .select({
+      id: rooms.id,
+      buildingId: rooms.buildingId,
+      roomNumber: rooms.roomNumber,
+      roomType: rooms.roomType,
+      displayName: rooms.displayName,
+      capacity: rooms.capacity,
+      floor: rooms.floor,
+      accessible: rooms.accessible,
+      notes: rooms.notes,
+      photoFront: rooms.photoFront,
+      photoBack: rooms.photoBack,
+      buildingName: buildings.name,
+      buildingAbbrev: buildings.abbreviation,
+    })
+    .from(rooms)
+    .innerJoin(buildings, eq(rooms.buildingId, buildings.id))
+    .where(eq(rooms.id, id))
+    .limit(1);
+
+  if (roomResult.length === 0) return null;
+
+  const room = roomResult[0];
+
+  const roomFeaturesData = await db
+    .select({
+      featureId: roomFeatures.featureId,
+      quantity: roomFeatures.quantity,
+      details: roomFeatures.details,
+      featureName: features.name,
+      featureCategory: features.category,
+    })
+    .from(roomFeatures)
+    .innerJoin(features, eq(roomFeatures.featureId, features.id))
+    .where(eq(roomFeatures.roomId, id));
+
+  return {
+    ...room,
+    features: roomFeaturesData.map((rf) => ({
+      id: rf.featureId,
+      name: rf.featureName,
+      category: rf.featureCategory,
+      quantity: rf.quantity,
+      details: rf.details,
+    })),
+  };
+}
